@@ -1,7 +1,7 @@
 {
   "name": "숲나들e 빈자리 조회",
   "short_name": "숲나들e",
-  "start_url": "/index.html",
+  "start_url": "/forest-app/index.html",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#27ae60",
