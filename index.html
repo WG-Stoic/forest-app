@@ -96,6 +96,14 @@
             resultBox.innerHTML = `<strong>[조회 완료]</strong><br>📅 날짜: ${date}<br>📍 지역: ${region}<br>✨ 결과: 잔여 객실 2개 발견! (테스트 성공)`;
         }, 1000);
     }
+    // 브라우저가 서비스 워커를 지원하는 경우 등록 실행
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/forest-app/sw.js')
+                .then(reg => console.log('Service Worker 등록 성공!', reg))
+                .catch(err => console.log('Service Worker 등록 실패:', err));
+        });
+    }
 </script>
 
 </body>

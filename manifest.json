@@ -1,4 +1,5 @@
-{{
+{
+  "id": "/forest-app/",
   "name": "숲나들e 빈자리 조회",
   "short_name": "숲나들e",
   "start_url": "/forest-app/index.html",
