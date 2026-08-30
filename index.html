@@ -84,24 +84,44 @@
 </div>
 
 <script>
-    function checkVacancy() {
+    async function checkVacancy() {
         const date = document.getElementById('date').value;
         const region = document.getElementById('region').value;
         const resultBox = document.getElementById('result-box');
 
-        resultBox.innerHTML = `⏳ ${date} 기준 데이터를 조회 중입니다...`;
+        resultBox.innerHTML = `⏳ ${date} 데이터를 조회 중입니다... 잠시만 기다려주세요.`;
 
-        // 가상의 서버 통신 시뮬레이션 (나중에는 실제 백엔드 API와 연결됩니다)
-        setTimeout(() => {
-            resultBox.innerHTML = `<strong>[조회 완료]</strong><br>📅 날짜: ${date}<br>📍 지역: ${region}<br>✨ 결과: 잔여 객실 2개 발견! (테스트 성공)`;
-        }, 1000);
+        try {
+            // 내 컴퓨터에서 돌고 있는 파이썬 백엔드 서버(Flask)와 명확히 통신
+            const response = await fetch(`http://localhost:5000/api/vacancies?date=${date}&region=${region}`);
+
+            if (!response.ok) {
+                throw new Error('서버 통신에 실패했습니다.');
+            }
+
+            const data = await response.json();
+
+            let html = `<strong>[조회 성공]</strong> 📅 ${date}<br><br>`;
+            if (data.length === 0) {
+                html += "잔여 객실이 없습니다. 😢";
+            } else {
+                data.forEach(item => {
+                    html += `🌲 <b>${item.name}</b><br>🚪 ${item.room} - <span style="color:red;">${item.status}</span><br><hr style="border:0; border-top:1px dashed #a3e4d7; margin:5px 0;">`;
+                });
+            }
+            resultBox.innerHTML = html;
+
+        } catch (error) {
+            resultBox.innerHTML = `⚠️ 서버 연결 실패<br><small>파이썬 백엔드 서버가 켜져 있는지 확인해주세요.</small>`;
+        }
     }
-    // 브라우저가 서비스 워커를 지원하는 경우 등록 실행
+
+    // 서비스 워커 등록 코드 (PWA 유지용)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/forest-app/sw.js')
-                .then(reg => console.log('Service Worker 등록 성공!', reg))
-                .catch(err => console.log('Service Worker 등록 실패:', err));
+                .then(reg => console.log('Service Worker 등록 성공!'))
+                .catch(err => console.log('Service Worker 등록 실패'));
         });
     }
 </script>
