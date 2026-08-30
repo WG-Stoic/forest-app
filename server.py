@@ -4,7 +4,9 @@ from datetime import datetime
 import requests
 
 app = Flask(__name__)
-CORS(app)
+# 모든 도메인과 출처에서의 접근을 완전 허용
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 방지
 
 def validate_inputs(target_date, region):
     """[검증 레이어] 필수 파라미터 및 날짜 포맷 확인"""

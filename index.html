@@ -52,7 +52,7 @@
 </div>
 
 <script>
-    async function checkVacancy() {
+async function checkVacancy() {
         const date = document.getElementById('date').value;
         const region = document.getElementById('region').value;
         const resultBox = document.getElementById('result-box');
@@ -65,35 +65,45 @@
         resultBox.innerHTML = `⏳ 데이터를 조회 중입니다... 잠시만 기다려주세요.`;
 
         try {
-            // [주의] 로컬 테스트 시에는 http://localhost:5000 을 사용하시고, 
-            // 클라우드 연동 시에는 Render 주소(예: https://forest-app-d9t1.onrender.com)를 사용하세요.
-           const response = await fetch('[https://forest-app-d9t1.onrender.com/api/vacancies?date=$](https://forest-app-d9t1.onrender.com/api/vacancies?date=$){date}&region=${region}');
+            const url = `https://forest-app-d9t1.onrender.com/api/vacancies?date=${date}&region=${region}`;
+            
+            // fetch 요청 옵션 명시
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                },
+                mode: "cors"
+            });
+
+            if (!response.ok) {
+                throw new Error("서버 응답 오류 (" + response.status + ")");
+            }
 
             const data = await response.json();
 
-            // 백엔드에서 에러를 반환했을 경우 처리 (k-skill 검증 명세 반영)
             if (data.error) {
                 throw new Error(data.message);
             }
 
-            let html = `<strong>[조회 성공]</strong> 📅 ${data.date}<br><br>`;
+            let html = "<strong>[조회 성공]</strong> 📅 " + data.date + "<br><br>";
             
-            // data.results 배열에 접근하여 화면에 렌더링
             if (data.count === 0) {
                 html += "해당 조건에 맞는 잔여 객실이 없습니다. 😢";
             } else {
-                html += `<small>총 ${data.count}건의 빈자리가 발견되었습니다.</small><br><br>`;
+                html += "<small>총 " + data.count + "건의 빈자리가 발견되었습니다.</small><br><br>";
                 data.results.forEach(item => {
-                    html += `🌲 <b>${item.forestName}</b><br>
-                             🚪 ${item.roomName}<br>
-                             💰 ${item.price} - <span style="color:${item.status === '마감' ? 'gray' : 'red'};">${item.status}</span><br>
-                             <hr style="border:0; border-top:1px dashed #a3e4d7; margin:5px 0;">`;
+                    const statusColor = item.status === '마감' ? 'gray' : 'red';
+                    html += "🌲 <b>" + item.forestName + "</b><br>" +
+                            "🚪 " + item.roomName + "<br>" +
+                            "💰 " + item.price + " - <span style='color:" + statusColor + ";'>" + item.status + "</span><br>" +
+                            "<hr style='border:0; border-top:1px dashed #a3e4d7; margin:5px 0;'>";
                 });
             }
             resultBox.innerHTML = html;
 
         } catch (error) {
-            resultBox.innerHTML = `⚠️ 조회 실패<br><small>${error.message}</small>`;
+            resultBox.innerHTML = "⚠️ 조회 실패<br><small>" + error.message + "</small>";
         }
     }
 
